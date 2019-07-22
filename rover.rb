@@ -10,12 +10,14 @@ class Rover
   attr_reader :y
   attr_reader :orient
 
-  def initialize
+  def initialize(whichPlanet=nil)
     @x = 10
     @y = 10
     @orient = 'N'
     @angle = 90
     @coords = [[@x, @y], @orient]
+    @planet = whichPlanet
+    puts @planet
   end
 
   def location
@@ -59,7 +61,14 @@ class Rover
     # Catch letter repetitions:
     if charAr[breakIndex].nil? == true || charAr[breakIndex][/[FBLR]/]
       angle, steps =convertToCommand(charAr[breakIndex-1], 1)
+      prevCoordinates = @coords
       calculateCoordinates([steps, angle])
+
+      if objectDetection([@x, @y]) == true
+        @coords = prevCoordinates
+        puts "Obstacle detected! Operation aborted"
+        return self.location
+      end
 
       if charAr[breakIndex..-1].empty?
         puts "Rover has finished executing the commands."
@@ -71,8 +80,15 @@ class Rover
 
     # Grab the values from that index until the next letter:
     numbers = charAr[breakIndex..-1][/[^LRFB]+/]
-    angle, steps =convertToCommand(charAr[breakIndex-1], numbers.to_i)
+    angle, steps = convertToCommand(charAr[breakIndex-1], numbers.to_i)
+    prevCoordinates = @coords
     calculateCoordinates([steps, angle])
+
+    if objectDetection([@x, @y]) == true
+      @coords = prevCoordinates
+      puts "Obstacle detected! Operation aborted"
+      return self.location
+    end
 
       if charAr[numbers.size+1..-1].empty?
         puts "Rover has finished executing the commands."
@@ -97,10 +113,11 @@ class Rover
       @angle % 360
     end
     #puts "number of steps is #{c[0]}"
-
-    xa = c[0] * Math.cos(deg2rad(@angle)) #steps
-    ya = c[0] * Math.sin(deg2rad(@angle))
-
+    puts "magnitude is #{c[0]}"
+    xa = (c[0] * Math.cos(deg2rad(@angle))).round #steps # 0.9996
+    ya = (c[0] * Math.sin(deg2rad(@angle))).round # 0.0274
+    puts "x steps #{xa}"
+    puts "y steps #{ya}"
     @x += xa
     @y += ya
     wrap
@@ -111,12 +128,18 @@ class Rover
     return [[@x, @y], @orient]
   end
 
-  def objectDetection()
-    #...
+  def objectDetection(c)
+    if@planet == nil
+      return false
+    end
+    if @planet.obstacle == c
+      return true
+    else
+      return false
+    end
   end
 
   def wrap()
-    puts @x
   @x = @x % 100
   @y = @y % 100
 
@@ -150,7 +173,18 @@ class Rover
 
 end
 
-rover = Rover.new
+class Planet
+  attr_reader :obstacle
+  def initialize
+    @obstacle = [10, 20]
+  end
+end
+
+mars = Planet.new
+#print mars.obstacle
+#1.57079
+rover = Rover.new(mars)
 rover.location
-rover.send('f100')
+rover.send('f20b10r140')
 #rover.location
+
