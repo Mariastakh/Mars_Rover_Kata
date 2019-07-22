@@ -34,7 +34,13 @@ describe Rover do
 
     it "wraps values great than 100" do
       r = Rover.new
-      expect(r.send('f90')).to eq([[10.000000000000005, 0.0], 'N'])
+      expect(r.send('f90')).to eq([[10.0, 0.0], 'N'])
+    end
+
+    it "detects stops if an obstacle is detected" do
+      mars = Planet.new
+      r = Rover.new(mars)
+      expect(r.send('f20b10r140')).to eq([[10.0, 30.0], 'N'])
     end
 
 end
