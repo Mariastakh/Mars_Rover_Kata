@@ -17,7 +17,6 @@ class Rover
     @angle = 90
     @coords = [[@x, @y], @orient]
     @planet = whichPlanet
-    puts @planet
   end
 
   def location
@@ -47,7 +46,7 @@ class Rover
       puts "Please enter a command."
       return nil
     end
-    #if isStringEmpty(charAr) == true return nil
+
     charAr.upcase!
 
     if charAr[0][/[LRFB]/] == nil
@@ -104,20 +103,17 @@ class Rover
   end
 
   def calculateCoordinates(c)
-    @angle += c[1] # angle
-    #puts " new angle is #{@angle} "
+    @angle += c[1]
 
     if @angle < 0
       @angle = @angle % -360
     elsif @angle > 0
       @angle % 360
     end
-    #puts "number of steps is #{c[0]}"
-    puts "magnitude is #{c[0]}"
-    xa = (c[0] * Math.cos(deg2rad(@angle))).round #steps # 0.9996
-    ya = (c[0] * Math.sin(deg2rad(@angle))).round # 0.0274
-    puts "x steps #{xa}"
-    puts "y steps #{ya}"
+
+    xa = (c[0] * Math.cos(deg2rad(@angle))).round
+    ya = (c[0] * Math.sin(deg2rad(@angle))).round
+
     @x += xa
     @y += ya
     wrap
@@ -179,12 +175,4 @@ class Planet
     @obstacle = [10, 20]
   end
 end
-
-mars = Planet.new
-#print mars.obstacle
-#1.57079
-rover = Rover.new(mars)
-rover.location
-rover.send('f20b10r140')
-#rover.location
 
